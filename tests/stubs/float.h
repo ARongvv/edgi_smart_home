@@ -1,0 +1,4 @@
+#ifndef SCA_TEST_FLOAT_H
+#define SCA_TEST_FLOAT_H
+#define DBL_EPSILON 2.2204460492503131e-16
+#endif

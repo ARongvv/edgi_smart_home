@@ -1,0 +1,63 @@
+# RT-Thread build outputs
+build/
+Debug/
+Release/
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.axf
+*.lst
+
+# RT-Thread Studio
+.settings/
+.project
+.cproject
+.metadata/
+*.launch
+
+# env tool
+.config
+.config.old
+rtconfig.h.bak
+
+# toolchain / vendor packages (fetched, not committed)
+packages/*
+!packages/README.md
+!packages/SConscript
+!packages/lvgl/
+packages/lvgl/*
+!packages/lvgl/SConscript
+!packages/lvgl/lv_conf.h
+!packages/cagent/
+packages/cagent/*
+!packages/cagent/ports/
+packages/cagent/ports/*
+!packages/cagent/ports/rtthread/
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# local credentials (real API keys / Wi-Fi password) - never commit
+secrets.json
+**/secrets*.json
+!**/secrets.example.json
+
+# AI assistant local state
+.trae/
+.workbuddy/
+
+# python cache
+__pycache__/
+*.pyc
+
+# scons state
+.sconsign.dblite

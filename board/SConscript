@@ -1,0 +1,23 @@
+import os
+from building import *
+
+cwd = GetCurrentDir()
+src = ['board.c']
+path = [os.path.dirname(cwd)]
+
+if GetDepend(['SCA_UI_LVGL']):
+    src += ['ports/sca_display_port.c']
+    src += ['ports/sca_touch_port.c']
+
+src += ['ports/sca_storage_port.c']
+src += ['ports/sca_wifi_port.c']
+
+# 音频端口需要 RT-Thread 的 audio_pipe.h（它在 drivers/audio 下，
+# 不在 drivers/include 里）。只在开音频时把该目录加进路径。
+if GetDepend(['RT_USING_AUDIO']):
+    src += ['ports/sca_audio_port.c']
+    path += [os.path.join(os.environ.get('RTT_ROOT', ''), 'components/drivers/audio')]
+
+group = DefineGroup('Board', src, depend=[''], CPPPATH=path)
+
+Return('group')

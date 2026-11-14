@@ -1,0 +1,29 @@
+import os
+import subprocess
+import sys
+from building import *
+
+Import('env')
+
+# 运行时资源（skills 的 .md、字体、图标）不参与编译，
+# 由 tools/deploy_resources.py 打包进 littlefs 镜像。
+# 这里只把 resources/ 目录登记为只读资源，便于构建脚本定位。
+
+group = DefineGroup('SCA_Resources', [], depend=[''], CPPPATH=[GetCurrentDir()])
+
+# Explicit staging target; never formats LittleFS or touches smart_home/secrets.json.
+def deploy_resources(target, source, env):
+    manifest = str(target[0])
+    staging = os.path.join(os.path.dirname(manifest), 'res')
+    script = os.path.join(Dir('#').abspath, 'tools', 'deploy_resources.py')
+    subprocess.check_call([sys.executable, script, '--target', staging,
+                           '--manifest', manifest])
+    return 0
+
+resource_inputs = Glob('skills/*.md')
+resource_inputs += [File('../tools/deploy_resources.py')]
+resource_manifest = env.Command('#build/resources/resource-manifest.json',
+                                resource_inputs, deploy_resources)
+env.Alias('demo-resources', resource_manifest)
+
+Return('group')

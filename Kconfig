@@ -1,0 +1,40 @@
+# Edgi-Talk SmartHome 工程配置入口
+#
+# 说明：
+#   rtconfig.h 由 menuconfig 生成，本文件只定义工程新增的菜单项。
+#   所有 SMART_HOME_* 符号集中在这里，避免散落。
+
+mainmenu "Edgi-Talk SmartHome Configuration"
+
+config SMART_HOME_ENABLE
+    bool "Enable SmartHome application"
+    default y
+    help
+        Master switch. Disable to build a bare RT-Thread image without
+        the SmartHome application, agents, or LVGL UI.
+
+if SMART_HOME_ENABLE
+
+source "$PROJECT_ROOT/port/Kconfig"
+source "$PROJECT_ROOT/smart_home/Kconfig"
+
+endif
+
+menu "Board / runtime paths"
+
+config SMART_HOME_ROOT
+    string "Runtime resource root"
+    default "/littlefs"
+    help
+        Root directory of the runtime data partition. All persistent
+        files (skills, fonts, icons, config, session logs) live under
+        this path. The POSIX-style '/data' path is not used here.
+
+config SMART_HOME_RES_DIR
+    string "Read-only resource directory"
+    default "/littlefs/res"
+    help
+        Directory holding skills/, fonts/ and icons/. Provisioned from
+        the build host, mounted read-only. Runtime never writes here.
+
+endmenu

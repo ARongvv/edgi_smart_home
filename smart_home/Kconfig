@@ -1,0 +1,110 @@
+menu "SmartHome modules"
+
+config SCA_ENABLE_APP
+    bool "Build SmartHome application core"
+    default y
+
+config SCA_MILOCO
+    bool "Mi Home (miloco) gateway bridge"
+    default y
+    help
+        Local-network HTTP bridge to a Miloco backend. Polls device
+        status every 5s and exposes miot_device_list / miot_device_control
+        as agent tools. Requires SCA_ENABLE_APP.
+
+config SCA_REMINDERS
+    bool "Timers and reminders"
+    default y
+    help
+        Up to 8 persisted countdown / one-shot alarms. Persisted to
+        SCA_REMINDER_PATH.
+
+config SCA_USER_MEMORY
+    bool "Long-term user preference memory"
+    default y
+    help
+        Persists user preferences across sessions and injects a short
+        summary into the agent context.
+
+config SCA_CAMERA
+    bool "Camera preview (USB-UVC)"
+    default n
+    help
+        Requires a USB camera module and the CherryUSB host stack.
+        This board has no MIPI camera, so preview goes through UVC instead.
+
+config SCA_UI_LVGL
+    bool "LVGL touch UI"
+    default y
+    select BSP_USING_LVGL
+    help
+        Panel UI for the 800x480 display.
+
+config SCA_SESSION_PERSIST
+    bool "Persist conversation sessions to JSONL"
+    default y
+    help
+        Keeps the last SCA_SESSION_TURNS turns on disk so chat history
+        survives a reboot.
+
+config SCA_DEBUG_LOG
+    bool "Verbose debug logging"
+    default n
+
+endmenu
+
+menu "Voice pipeline"
+
+config SCA_VAD
+    bool "Voice activity detection"
+    default n
+    select SCA_VOICE_CAPTURE
+
+config SCA_VOICE_ASR
+    bool "Cloud ASR (record then upload)"
+    default n
+    select SCA_VOICE_CAPTURE
+
+config SCA_VOICE_TTS
+    bool "Cloud TTS playback"
+    default n
+
+config SCA_KWS
+    bool "On-device wake word (runs on M33)"
+    default n
+    help
+        The wake-word model runs on the M33 core with the NNLite NPU.
+        Selecting this only builds the M55-side IPC client; the M33
+        firmware lives in a separate project (Edgi_Talk_M33_VoiceKws).
+
+config SCA_VOICE_CAPTURE
+    bool
+    default n
+
+endmenu
+
+menu "SmartHome capacities"
+
+config SCA_STACK_AGENT
+    int "Agent worker stack (bytes)"
+    default 16384
+
+config SCA_STACK_MILOCO
+    int "Miloco worker stack (bytes)"
+    default 12288
+
+config SCA_STACK_VOICE
+    int "Voice worker stack (bytes)"
+    default 8192
+
+config SCA_STACK_CAMERA
+    int "Camera worker stack (bytes)"
+    default 6144
+
+comment "Agent/model/session capacities: port/sca_agent_profile.h (shared build profile)"
+
+config SCA_MAX_DEVICES
+    int "Maximum devices in a miloco snapshot"
+    default 16
+
+endmenu

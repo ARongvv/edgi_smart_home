@@ -1,0 +1,117 @@
+import os
+from building import *
+
+cwd    = GetCurrentDir()
+src    = []
+path   = [cwd, os.path.dirname(cwd)]
+
+# ── 阶段 3：agent 编排（cAGENT 胶水）──
+if GetDepend(['SCA_ENABLE_APP']):
+    src += [
+        'core/smart_home_app.c',
+        # UI 事件回调：agent 层通过 smart_home_ui_event_cb 把工具调用
+        # 进度转给界面。它与 LVGL 无关（只做结构体转换），所以放在
+        # 基础源文件里，不随 SCA_UI_LVGL 开关。
+        'ui/smart_home_ui.c',
+        'core/smart_home_cpu_debug.c',
+        'core/smart_home_memory.c',
+        'agent/smart_home_agent.c',
+        'agent/smart_home_agent_diag.c',
+        'agent/smart_home_agent_backend.c',
+        'agent/smart_home_session.c',
+        'device/smart_home_device.c',
+        'device/smart_home_device_service.c',
+        'device/smart_home_device_persistence.c',
+        'skills/smart_home_scene_catalog.c',
+        'skills/smart_home_skill_loader.c',
+        'skills/smart_home_skills.c',
+        'tools/smart_home_tools.c',
+        'tools/smart_home_device_inventory.c',
+        # 阶段 6：网络状态机
+        'net/smart_home_network.c',
+    ]
+
+# ── 阶段 2：可选模块 ──
+if GetDepend(['SCA_USER_MEMORY']):
+    src += ['memory/smart_home_user_memory.c',
+            'tools/smart_home_user_memory_tools.c']
+
+if GetDepend(['SCA_REMINDERS']):
+    src += ['reminder/smart_home_reminder.c',
+            'reminder/smart_home_reminder_tools.c']
+
+if GetDepend(['SCA_MILOCO']):
+    src += [
+        'miloco/smart_home_miloco_client.c',
+        'miloco/smart_home_miloco_service.c',
+        'miloco/smart_home_miloco_specscan.c',
+        'miloco/smart_home_miloco_protocol.c',
+        'miloco/smart_home_miloco_scene.c',
+        'miloco/smart_home_miloco_tools.c',
+        'miloco/smart_home_miloco_qr.c',
+    ]
+
+# ── 阶段 4：配置与持久化 ──
+if GetDepend(['SCA_ENABLE_APP']):
+    src += [
+        'config/smart_home_backends.c',
+        'config/smart_home_config_store.c',
+        'config/smart_home_secrets.c',
+    ]
+
+# ── 阶段 5：UI ──
+if GetDepend(['SCA_UI_LVGL']):
+    src += [
+        'ui/lvgl/smart_home_lvgl.c',
+        'ui/lvgl/smart_home_lvgl_shell.c',
+        'ui/lvgl/smart_home_lvgl_nav.c',
+        'ui/lvgl/smart_home_lvgl_home_v9.c',
+        'ui/lvgl/smart_home_lvgl_chat.c',
+        'ui/lvgl/smart_home_lvgl_agent.c',
+        'ui/lvgl/smart_home_lvgl_history.c',
+        'ui/lvgl/smart_home_lvgl_settings_v9.c',
+        'ui/lvgl/smart_home_lvgl_device_dialog.c',
+        'ui/lvgl/smart_home_lvgl_room_dialog.c',
+        'ui/lvgl/smart_home_lvgl_device_refresh.c',
+        'ui/lvgl/smart_home_lvgl_screensaver.c',
+        'ui/lvgl/smart_home_lvgl_style.c',
+        'ui/lvgl/smart_home_v9_device_view.c',
+        'ui/lvgl/icons/smart_home_lvgl_png_icons.c',
+        # CJK 子集字体以 .incbin 编入 .rodata（见 fonts/cjk_font.S）。
+        'ui/lvgl/fonts/cjk_font.S',
+    ]
+    if GetDepend(['SCA_MILOCO']):
+        src += ['ui/lvgl/smart_home_lvgl_miloco_bind.c']
+    if GetDepend(['SCA_CAMERA']):
+        src += ['ui/lvgl/smart_home_lvgl_camera_dialog.c']
+    if GetDepend(['SCA_REMINDERS']):
+        src += ['ui/lvgl/smart_home_lvgl_reminder.c']
+    src += Glob('ui/lvgl/icons/generated/*.c')
+
+# ── 阶段 7：语音（可选，默认关闭）──
+# 这一组尚未完成 RT-Thread 适配（ALSA/KWS 模型直调），只有对应开关打开
+# 才会进构建。开口前需要先完成 sca_audio.h 的板级实现。
+if GetDepend(['SCA_VOICE_TTS']):
+    src += ['voice/smart_home_tts.c',
+            'voice/smart_home_voice_play.c',
+            'voice/smart_home_voice_player.c',
+            'voice/smart_home_voice_resample.c']
+if GetDepend(['SCA_VOICE_ASR']):
+    src += ['voice/smart_home_asr.c',
+            'voice/smart_home_voice_capture.c']
+if GetDepend(['SCA_VAD']):
+    src += ['voice/smart_home_vad.c']
+if GetDepend(['SCA_KWS']):
+    src += ['voice/smart_home_kws_service.c',
+            'voice/smart_home_kws_frontend.c']
+
+# ── 阶段 8：摄像头（可选）──
+if GetDepend(['SCA_CAMERA']):
+    src += ['camera/smart_home_camera_service.c',
+            'camera/smart_home_camera_control.c',
+            'camera/smart_home_snapshot_store.c',
+            'tools/smart_home_camera_tools.c']
+
+group = DefineGroup('SmartHome', src, depend=[''], CPPPATH=path)
+
+Return('group')

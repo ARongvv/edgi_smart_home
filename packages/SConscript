@@ -1,0 +1,86 @@
+import os
+from building import *
+
+cwd  = GetCurrentDir()
+src  = []
+path = [cwd]
+defines = []
+
+# LVGL：独立 group（见 packages/lvgl/SConscript），这里只登记包含路径
+if GetDepend(['SCA_UI_LVGL']):
+    path += [os.path.join(cwd, 'lvgl'), os.path.join(cwd, 'lvgl/src')]
+
+# cJSON：纯 C，无 OS 依赖
+if GetDepend(['SCA_ENABLE_APP']):
+    src += ['cjson/cJSON.c']
+    path += [os.path.join(cwd, 'cjson')]
+
+# cAGENT：只编译内核 + rtthread 端口，不编译 openvela 端口
+if GetDepend(['SCA_ENABLE_APP']):
+    # Match the original SmartHome profile. The default 12 slots cannot
+    # hold the enabled device, reminder, Mi Home, and memory tools.
+    defines.append('CONFIG_AGENT_MAX_TOOLS=24')
+    path += [
+        os.path.join(cwd, 'cagent/include'),
+        os.path.join(cwd, 'cagent/src'),
+        os.path.join(cwd, 'cagent/codecs/json'),
+        os.path.join(cwd, 'cagent/codecs/json/vendor/jsmn'),
+        os.path.join(cwd, 'cagent/providers/model/openai/include'),
+        os.path.join(cwd, 'cagent/providers/storage/ram/include'),
+        os.path.join(cwd, 'cagent/providers/storage/files/include'),
+        os.path.join(cwd, 'cagent/providers/storage/jsonl/include'),
+        os.path.join(cwd, 'cagent/ports/rtthread'),
+        os.path.join(cwd, 'cagent/ports/rtthread/storage/include'),
+        os.path.join(cwd, 'qrcodegen'),
+    ]
+    src += Glob('cagent/src/*.c')
+    src += Glob('cagent/src/*/*.c')
+    src += Glob('cagent/codecs/json/*.c')
+    src += Glob('cagent/codecs/json/vendor/jsmn/*.c')
+    src += Glob('cagent/ports/rtthread/*.c')
+
+    # providers / 存储端口：之前漏了这三个目录的 .c，
+    # 导致 agent_openai_provider_init / agent_session_jsonl_init /
+    # agent_posix_file_store_init 全部 undefined reference。
+    src += Glob('cagent/ports/rtthread/storage/src/*.c')
+    src += Glob('cagent/providers/model/openai/src/*.c')
+    src += Glob('cagent/providers/storage/ram/src/*.c')
+    src += Glob('cagent/providers/storage/files/src/*.c')
+    src += Glob('cagent/providers/storage/jsonl/src/*.c')
+
+# Mbed TLS 3.6.5 LTS (upstream commit e185d7fd85499c8ce5ca2a54f5cf8fe7dbe3f8df).
+# Only the project TLS client profile is enabled; no SAL TLS shim is required.
+if GetDepend(['RT_USING_MBEDTLS']):
+    path += [os.path.join(cwd, 'mbedtls/include')]
+    src += Glob('mbedtls/library/*.c')
+    defines.append('MBEDTLS_CONFIG_FILE=\\"port/sca_mbedtls_config.h\\"')
+
+# RT-Thread netutils 1.3.3 NTP client (commit 19d1a2908f82e8d7c2a63e1e69083fd798b520bf).
+if GetDepend(['RT_USING_SNTP']):
+    path += [os.path.join(cwd, 'netutils/ntp')]
+    src += ['netutils/ntp/ntp.c']
+    defines += [
+        'PKG_NETUTILS_NTP',
+        'NETUTILS_NTP_HOSTNAME=\\"pool.ntp.org\\"',
+        'NETUTILS_NTP_HOSTNAME2=\\"ntp.aliyun.com\\"',
+        'NETUTILS_NTP_HOSTNAME3=\\"time.windows.com\\"',
+    ]
+
+# qrcodegen：米家扫码绑定用的 QR 编码库（纯 C，无依赖）
+if GetDepend(['SCA_MILOCO']):
+    path += [os.path.join(cwd, 'qrcodegen')]
+    src += Glob('qrcodegen/*.c')
+
+# RT-Thread 5.0 的 DFS v1 把 open() 声明放在
+# libc/compilers/common/extension/fcntl/octal/fcntl.h（newlib 的
+# fcntl.h 不含它）。必须以 extension 子目录为根加进路径，
+# 否则 <fcntl.h> 只找到 newlib 的版本，open 变成隐式声明。
+# 注意只加 fcntl 这一层，不要加整个 extension —— 那里的
+# sys/types.h 会与 newlib 冲突。
+_rtt = os.environ.get('RTT_ROOT', '')
+if _rtt:
+    path += [os.path.join(_rtt, 'components/libc/compilers/common/extension/fcntl/octal')]
+
+group = DefineGroup('SCA_Packages', src, depend=[''], CPPPATH=path, CPPDEFINES=defines)
+
+Return('group')

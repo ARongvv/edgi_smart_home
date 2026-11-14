@@ -1,0 +1,18 @@
+import os
+from building import *
+
+cwd  = GetCurrentDir()
+path = [cwd, os.path.dirname(cwd)]
+
+src = ['sca_os_rtthread.c', 'sca_fs.c', 'sca_http.c', 'sca_http_body.c']
+
+if GetDepend(['SCA_HTTP_USE_TLS']):
+    src += ['sca_mbedtls_port.c']
+
+# 显示绑定依赖 LVGL，只有开 UI 时才编译
+if GetDepend(['SCA_UI_LVGL']):
+    src += ['sca_display.c']
+
+group = DefineGroup('SCA_Port', src, depend=[''], CPPPATH=path)
+
+Return('group')

@@ -1,0 +1,54 @@
+import os
+from building import *
+
+cwd    = GetCurrentDir()
+src    = []
+path   = [cwd, cwd + '/src']
+
+# LVGL headers include each other by relative path. Only export its entry
+# directories so the ThorVG emulation headers cannot shadow the BSP's VG Lite.
+src_dir = cwd + '/src'
+
+if GetDepend(['SCA_UI_LVGL']) and os.path.isdir(src_dir):
+
+    # 这些 .c 内部没有 #if LV_USE_xxx 保护（或保护不完整），
+    # 必须在构建期显式排除，否则会带进不需要的代码与依赖。
+    DISABLED = {
+        # 图片/条码解码器：lv_conf.h 全部置 0
+        'lv_lodepng.c', 'lv_libpng.c', 'lv_bmp.c', 'lv_tjpgd.c',
+        'lv_gif.c', 'lv_qrcode.c', 'lv_barcode.c', 'lv_svg.c',
+        # 多余 widget
+        'lv_calendar.c', 'lv_colorwheel.c', 'lv_imgbtn.c',
+        'lv_matrix.c', 'lv_3dtexture.c', 'lv_arclabel.c',
+        'lv_snapshot.c',
+        # 输入设备驱动：触摸在 sca_display.c 里手写绑定
+        'lv_evdev.c', 'lv_libinput.c',
+        # 字体：只保留 Montserrat 的若干尺寸，CJK/像素字体各占几百 KB
+        'lv_font_simsun_14_cjk.c', 'lv_font_simsun_16_cjk.c',
+        'lv_font_unscii_8.c', 'lv_font_unscii_16.c',
+        'lv_font_dejavu_16_persian_hebrew.c',
+        # 从文件加载字体的加载器：本工程不用外部字体
+        'lv_binfont_loader.c',
+        # FreeType 端口不用；TinyTTF 用于按需加载 CJK 子集字体，
+        # 文件内部有 #if LV_USE_TINY_TTF 保护，配置关闭时不产出代码。
+        'lv_freetype.c',
+    }
+
+    # smart_home_lvgl_font() 实际映射到的内置字号
+    KEEP_FONT_SIZES = {'12', '14', '16', '18', '20', '22',
+                       '24', '26', '28', '32', '38', '48'}
+
+    for root, _, files in os.walk(src_dir):
+
+        for f in files:
+            if not f.endswith('.c') or f in DISABLED:
+                continue
+            if f.startswith('lv_font_montserrat_'):
+                size = f[len('lv_font_montserrat_'):-len('.c')]
+                if size not in KEEP_FONT_SIZES:
+                    continue
+            src.append(os.path.relpath(os.path.join(root, f), cwd))
+
+group = DefineGroup('LVGL', src, depend=['SCA_UI_LVGL'], CPPPATH=path)
+
+Return('group')

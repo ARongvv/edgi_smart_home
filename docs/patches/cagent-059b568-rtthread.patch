@@ -1,0 +1,682 @@
+# cAGENT project integration patch
+# Base: Scintela/cAGENT 059b568210c0441dbe231038cdd120a3ab5cdbd2
+# Captures the existing Edgi-Talk integration: portable include guards,
+# compiler compatibility rewrites and JSONL trailer capacity reservation.
+# SPDX-License-Identifier: MIT
+
+diff --git a/include/agent/config.h b/include/agent/config.h
+--- a/include/agent/config.h
++++ b/include/agent/config.h
+@@ -4,6 +4,8 @@
+  */
+ /* Build-profile capacities, caller-storage and runtime initialization configuration. Interface draft; declarations do not imply an implemented feature. */
+ #pragma once
++#ifndef AGENT_CONFIG_H
++#define AGENT_CONFIG_H
+ 
+ /* Load one build-wide profile before exposing layout-dependent public types. */
+ #if defined(AGENT_BUILD_CONFIG_HEADER)
+@@ -212,3 +214,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_CONFIG_H */
+diff --git a/include/agent/context.h b/include/agent/context.h
+--- a/include/agent/context.h
++++ b/include/agent/context.h
+@@ -4,6 +4,8 @@
+  */
+ /* Bounded model-input contributions; registration is idle-only and borrowed. */
+ #pragma once
++#ifndef AGENT_CONTEXT_H
++#define AGENT_CONTEXT_H
+ 
+ #include <agent/error.h>
+ #include <agent/types.h>
+@@ -63,3 +65,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_CONTEXT_H */
+diff --git a/include/agent/error.h b/include/agent/error.h
+--- a/include/agent/error.h
++++ b/include/agent/error.h
+@@ -4,6 +4,8 @@
+  */
+ /* Portable flat error codes. Interface draft; declarations do not imply an implemented feature. */
+ #pragma once
++#ifndef AGENT_ERROR_H
++#define AGENT_ERROR_H
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -48,3 +50,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif
+diff --git a/include/agent/event.h b/include/agent/event.h
+--- a/include/agent/event.h
++++ b/include/agent/event.h
+@@ -4,6 +4,8 @@
+  */
+ /* Synchronous observation and cumulative statistics. Interface draft; declarations do not imply an implemented feature. */
+ #pragma once
++#ifndef AGENT_EVENT_H
++#define AGENT_EVENT_H
+ 
+ #include <agent/error.h>
+ #include <agent/types.h>
+@@ -46,3 +48,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_EVENT_H */
+diff --git a/include/agent/memory.h b/include/agent/memory.h
+--- a/include/agent/memory.h
++++ b/include/agent/memory.h
+@@ -4,6 +4,8 @@
+  */
+ /* Bounded long-term content operations, independent of storage and extraction. */
+ #pragma once
++#ifndef AGENT_MEMORY_H
++#define AGENT_MEMORY_H
+ 
+ #include <agent/types.h>
+ 
+@@ -69,3 +71,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_MEMORY_H */
+diff --git a/include/agent/model.h b/include/agent/model.h
+--- a/include/agent/model.h
++++ b/include/agent/model.h
+@@ -4,6 +4,8 @@
+  */
+ /* Synchronous model provider contract and explicit ownership binding. */
+ #pragma once
++#ifndef AGENT_MODEL_H
++#define AGENT_MODEL_H
+ 
+ #include <agent/config.h>
+ #include <agent/error.h>
+@@ -104,3 +106,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_MODEL_H */
+diff --git a/include/agent/policy.h b/include/agent/policy.h
+--- a/include/agent/policy.h
++++ b/include/agent/policy.h
+@@ -4,6 +4,8 @@
+  */
+ /* Application authorization, independent of schema and visibility. */
+ #pragma once
++#ifndef AGENT_POLICY_H
++#define AGENT_POLICY_H
+ 
+ #include <agent/tool.h>
+ 
+@@ -41,3 +43,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_POLICY_H */
+diff --git a/include/agent/runtime.h b/include/agent/runtime.h
+--- a/include/agent/runtime.h
++++ b/include/agent/runtime.h
+@@ -4,6 +4,8 @@
+  */
+ /* Application-supplied allocation, clock, logging and cancel synchronization. Interface draft; declarations do not imply an implemented feature. */
+ #pragma once
++#ifndef AGENT_RUNTIME_H
++#define AGENT_RUNTIME_H
+ 
+ #include <agent/types.h>
+ 
+@@ -47,3 +49,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif
+diff --git a/include/agent/session.h b/include/agent/session.h
+--- a/include/agent/session.h
++++ b/include/agent/session.h
+@@ -4,6 +4,8 @@
+  */
+ /* Format-independent, borrowed Session Storage and conversation controls. */
+ #pragma once
++#ifndef AGENT_SESSION_H
++#define AGENT_SESSION_H
+ 
+ #include <agent/error.h>
+ #include <agent/model.h>
+@@ -70,3 +72,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_SESSION_H */
+diff --git a/include/agent/skill.h b/include/agent/skill.h
+--- a/include/agent/skill.h
++++ b/include/agent/skill.h
+@@ -4,6 +4,8 @@
+  */
+ /* Borrowed, trusted instruction contributions; file loaders are optional providers. */
+ #pragma once
++#ifndef AGENT_SKILL_H
++#define AGENT_SKILL_H
+ 
+ #include <agent/error.h>
+ #include <agent/types.h>
+@@ -30,3 +32,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_SKILL_H */
+diff --git a/include/agent/tool.h b/include/agent/tool.h
+--- a/include/agent/tool.h
++++ b/include/agent/tool.h
+@@ -4,6 +4,8 @@
+  */
+ /* Borrowed tool registration and bounded synchronous execution. */
+ #pragma once
++#ifndef AGENT_TOOL_H
++#define AGENT_TOOL_H
+ 
+ #include <agent/error.h>
+ #include <agent/types.h>
+@@ -77,3 +79,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_TOOL_H */
+diff --git a/include/agent/transport.h b/include/agent/transport.h
+--- a/include/agent/transport.h
++++ b/include/agent/transport.h
+@@ -4,6 +4,8 @@
+  */
+ /* Provider-facing synchronous HTTP transport, independent of Core lifecycle. */
+ #pragma once
++#ifndef AGENT_TRANSPORT_H
++#define AGENT_TRANSPORT_H
+ 
+ #include <agent/error.h>
+ #include <agent/types.h>
+@@ -57,3 +59,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif
+diff --git a/include/agent/types.h b/include/agent/types.h
+--- a/include/agent/types.h
++++ b/include/agent/types.h
+@@ -4,6 +4,8 @@
+  */
+ /* Common handles, bounded views and cross-module execution values. Interface draft; declarations do not imply an implemented feature. */
+ #pragma once
++#ifndef AGENT_TYPES_H
++#define AGENT_TYPES_H
+ 
+ #if defined(AGENT_BUILD_CONFIG_HEADER)
+ #include AGENT_BUILD_CONFIG_HEADER
+@@ -183,3 +185,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif
+diff --git a/providers/model/openai/include/agent_openai_model.h b/providers/model/openai/include/agent_openai_model.h
+--- a/providers/model/openai/include/agent_openai_model.h
++++ b/providers/model/openai/include/agent_openai_model.h
+@@ -18,6 +18,10 @@
+     agent_string_view_t endpoint;         /* Complete chat/completions URL. */
+     agent_string_view_t model;            /* Model identifier. */
+     agent_string_view_t authorization;    /* Optional complete Bearer header value. */
++    bool use_legacy_max_tokens;           /* Emit "max_tokens" instead of
++                                             "max_completion_tokens"; some
++                                             OpenAI-compatible gateways accept
++                                             only the legacy field. */
+     char* request_buffer;                 /* JSON body, then response token storage. */
+     size_t request_capacity;
+     char* response_buffer;                /* Non-streaming response bytes. */
+diff --git a/providers/model/openai/src/openai_request.c b/providers/model/openai/src/openai_request.c
+--- a/providers/model/openai/src/openai_request.c
++++ b/providers/model/openai/src/openai_request.c
+@@ -226,7 +226,9 @@
+         if (status == AGENT_OK) status = append(&writer, OPENAI_LITERAL("]"));
+     }
+     if (status == AGENT_OK && request->max_output_tokens != 0u) {
+-        status = append(&writer, OPENAI_LITERAL(",\"max_completion_tokens\":"));
++        status = append(&writer, provider->config.use_legacy_max_tokens
++            ? OPENAI_LITERAL(",\"max_tokens\":")
++            : OPENAI_LITERAL(",\"max_completion_tokens\":"));
+         if (status == AGENT_OK) {
+             status = agent_json_writer_u32(&writer, request->max_output_tokens);
+         }
+diff --git a/providers/storage/jsonl/src/session_jsonl.c b/providers/storage/jsonl/src/session_jsonl.c
+--- a/providers/storage/jsonl/src/session_jsonl.c
++++ b/providers/storage/jsonl/src/session_jsonl.c
+@@ -152,6 +152,7 @@
+         message->tool_call_count > jsonl->config.read_call_capacity - jsonl->call_count)
+         return AGENT_ERROR_CAPACITY;
+     writer = resume_writer(jsonl);
++    writer.capacity -= sizeof("],\"o\":1}\n") - 1u;
+     if (jsonl->message_count)
+         status = agent_json_writer_literal(&writer, agent_string_view(",", 1u));
+     else
+diff --git a/providers/storage/ram/include/agent_session_ram.h b/providers/storage/ram/include/agent_session_ram.h
+--- a/providers/storage/ram/include/agent_session_ram.h
++++ b/providers/storage/ram/include/agent_session_ram.h
+@@ -71,6 +71,9 @@
+ agent_error_t agent_session_ram_init(agent_session_ram_t* ram,
+                                      const agent_session_ram_config_t* config);
+ 
++/* Drops aborted turns and oldest complete turns until at most keep remain; idle only. */
++agent_error_t agent_session_ram_trim(agent_session_ram_t* ram, size_t keep);
++
+ /* Copies an Ops table into a Session Storage binding; ram remains caller-owned. */
+ agent_error_t agent_session_ram_bind(agent_session_ram_t* ram,
+                                      agent_session_storage_t* storage);
+diff --git a/providers/storage/ram/src/session_ram.c b/providers/storage/ram/src/session_ram.c
+--- a/providers/storage/ram/src/session_ram.c
++++ b/providers/storage/ram/src/session_ram.c
+@@ -246,6 +246,18 @@
+     }
+ }
+ 
++agent_error_t agent_session_ram_trim(agent_session_ram_t* ram, size_t keep)
++{
++    size_t index;
++    if (!ram) return AGENT_ERROR_INVALID;
++    if (ram->active) return AGENT_ERROR_BUSY;
++    for (index = ram->turn_count; index > 0u; --index)
++        if (ram->config.turns[index - 1u].outcome != AGENT_SESSION_TURN_COMPLETE)
++            remove_turn(ram, index - 1u);
++    while (ram->turn_count > keep) remove_turn(ram, 0u);
++    return AGENT_OK;
++}
++
+ static agent_error_t ram_clear(void* context, agent_string_view_t session_id)
+ {
+     agent_session_ram_t* ram = context;
+diff --git a/src/context/context_internal.h b/src/context/context_internal.h
+--- a/src/context/context_internal.h
++++ b/src/context/context_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private context registry and bounded projection. */
+ #pragma once
++#ifndef AGENT_CONTEXT_INTERNAL_H
++#define AGENT_CONTEXT_INTERNAL_H
+ 
+ #include "core/arena_internal.h"
+ #include <agent/context.h>
+@@ -93,3 +95,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_CONTEXT_INTERNAL_H */
+diff --git a/src/core/arena_internal.h b/src/core/arena_internal.h
+--- a/src/core/arena_internal.h
++++ b/src/core/arena_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private checked arithmetic and caller-backed Core arena. */
+ #pragma once
++#ifndef AGENT_ARENA_INTERNAL_H
++#define AGENT_ARENA_INTERNAL_H
+ 
+ #include <agent/error.h>
+ #include <agent/types.h>
+@@ -32,3 +34,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_ARENA_INTERNAL_H */
+diff --git a/src/core/core_internal.h b/src/core/core_internal.h
+--- a/src/core/core_internal.h
++++ b/src/core/core_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private Core state; this layout is never a public ABI. */
+ #pragma once
++#ifndef AGENT_CORE_INTERNAL_H
++#define AGENT_CORE_INTERNAL_H
+ 
+ #include "context/context_internal.h"
+ #include "run/run_internal.h"
+@@ -74,3 +76,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_CORE_INTERNAL_H */
+diff --git a/src/core/text_internal.h b/src/core/text_internal.h
+--- a/src/core/text_internal.h
++++ b/src/core/text_internal.h
+@@ -2,6 +2,8 @@
+ /* SPDX-FileCopyrightText: 2026 tanglinjie */
+ /* Shared text admission, independent of JSON and optional domains. */
+ #pragma once
++#ifndef AGENT_TEXT_INTERNAL_H
++#define AGENT_TEXT_INTERNAL_H
+ #include <agent/types.h>
+ 
+ static inline bool agent_bytes_overlap(const void* a, size_t na, const void* b, size_t nb)
+@@ -52,3 +54,5 @@
+     }
+     return true;
+ }
++
++#endif /* AGENT_TEXT_INTERNAL_H */
+diff --git a/src/memory/memory_internal.h b/src/memory/memory_internal.h
+--- a/src/memory/memory_internal.h
++++ b/src/memory/memory_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Memory projection copies one explicit document into bounded turn scratch. */
+ #pragma once
++#ifndef AGENT_MEMORY_INTERNAL_H
++#define AGENT_MEMORY_INTERNAL_H
+ 
+ #include <agent/memory.h>
+ #include "core/arena_internal.h"
+@@ -20,3 +22,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_MEMORY_INTERNAL_H */
+diff --git a/src/model/model_internal.h b/src/model/model_internal.h
+--- a/src/model/model_internal.h
++++ b/src/model/model_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private model wrapper and synchronous dispatch. */
+ #pragma once
++#ifndef AGENT_MODEL_INTERNAL_H
++#define AGENT_MODEL_INTERNAL_H
+ 
+ #include <agent/model.h>
+ 
+@@ -26,3 +28,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_MODEL_INTERNAL_H */
+diff --git a/src/policy/policy_internal.h b/src/policy/policy_internal.h
+--- a/src/policy/policy_internal.h
++++ b/src/policy/policy_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private policy and confirmation composition. */
+ #pragma once
++#ifndef AGENT_POLICY_INTERNAL_H
++#define AGENT_POLICY_INTERNAL_H
+ 
+ #include <agent/policy.h>
+ 
+@@ -17,3 +19,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_POLICY_INTERNAL_H */
+diff --git a/src/run/react_loop.c b/src/run/react_loop.c
+--- a/src/run/react_loop.c
++++ b/src/run/react_loop.c
+@@ -132,14 +132,16 @@
+         agent_text_validate(call->id) != AGENT_OK ||
+         agent_text_validate(call->arguments_json) != AGENT_OK)
+         return output->status = AGENT_ERROR_MODEL_PARSE;
+-    {
+-        const agent_string_view_t fields[] = {call->id, call->name, call->arguments_json};
+-        for (i = 0u; i < 3u; ++i)
+-            if (agent_bytes_overlap(fields[i].data, fields[i].size,
+-                                    output->arena.base + output->start,
+-                                    output->arena.capacity - output->start))
+-                return output->status = AGENT_ERROR_MODEL_PARSE;
+-    }
++    if (agent_bytes_overlap(call->id.data, call->id.size,
++                            output->arena.base + output->start,
++                            output->arena.capacity - output->start) ||
++        agent_bytes_overlap(call->name.data, call->name.size,
++                            output->arena.base + output->start,
++                            output->arena.capacity - output->start) ||
++        agent_bytes_overlap(call->arguments_json.data, call->arguments_json.size,
++                            output->arena.base + output->start,
++                            output->arena.capacity - output->start))
++        return output->status = AGENT_ERROR_MODEL_PARSE;
+     for (i = 0u; i < output->count; ++i)
+         if (call->id.size == output->calls[i].id.size &&
+             !memcmp(call->id.data, output->calls[i].id.data, call->id.size))
+@@ -165,13 +167,13 @@
+     agent_error_t status;
+     for (i = 0u; i < output->count; ++i)
+     {
+-        agent_string_view_t* fields[] = {&output->calls[i].id, &output->calls[i].name,
+-                                         &output->calls[i].arguments_json};
+-        size_t j;
+-        for (j = 0u; j < 3u; ++j)
+-            fields[j]->data =
+-                (char*)arena->base + target + output->text_size +
+-                ((const unsigned char*)fields[j]->data - arena->base - output->arguments);
++        output->calls[i].id.data = (char*)arena->base + target + output->text_size +
++            ((const unsigned char*)output->calls[i].id.data - arena->base - output->arguments);
++        output->calls[i].name.data = (char*)arena->base + target + output->text_size +
++            ((const unsigned char*)output->calls[i].name.data - arena->base - output->arguments);
++        output->calls[i].arguments_json.data = (char*)arena->base + target + output->text_size +
++            ((const unsigned char*)output->calls[i].arguments_json.data - arena->base -
++             output->arguments);
+     }
+     memmove(arena->base + output->start + output->text_size, arena->base + output->arguments,
+             payload);
+@@ -368,18 +370,18 @@
+                         size_t bytes)
+ {
+     size_t i;
+-    const agent_string_view_t fields[] = {request->input, request->session_id, request->trace_id,
+-                                          agent->config.system_prompt};
+     if ((!data && bytes) || bytes > UINTPTR_MAX - (uintptr_t)data ||
+         agent_bytes_overlap(data, bytes, agent->workspace, agent->workspace_size) ||
+         agent_bytes_overlap(data, bytes, request, sizeof(*request)) ||
+         (request->limits &&
+          agent_bytes_overlap(data, bytes, request->limits, sizeof(*request->limits))) ||
+-        !agent_tool_registry_buffer_safe(agent->tools, data, bytes))
++        !agent_tool_registry_buffer_safe(agent->tools, data, bytes) ||
++        agent_bytes_overlap(data, bytes, request->input.data, request->input.size) ||
++        agent_bytes_overlap(data, bytes, request->session_id.data, request->session_id.size) ||
++        agent_bytes_overlap(data, bytes, request->trace_id.data, request->trace_id.size) ||
++        agent_bytes_overlap(data, bytes, agent->config.system_prompt.data,
++                            agent->config.system_prompt.size))
+         return false;
+-    for (i = 0u; i < sizeof(fields) / sizeof(fields[0]); ++i)
+-        if (agent_bytes_overlap(data, bytes, fields[i].data, fields[i].size))
+-            return false;
+     if (agent->skills)
+         for (i = 0u; i < agent->skills->count; ++i)
+         {
+diff --git a/src/run/run_internal.h b/src/run/run_internal.h
+--- a/src/run/run_internal.h
++++ b/src/run/run_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private cancellation token state for the synchronous run. */
+ #pragma once
++#ifndef AGENT_RUN_INTERNAL_H
++#define AGENT_RUN_INTERNAL_H
+ 
+ #include <agent/runtime.h>
+ 
+@@ -24,3 +26,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_RUN_INTERNAL_H */
+diff --git a/src/runtime/runtime_internal.h b/src/runtime/runtime_internal.h
+--- a/src/runtime/runtime_internal.h
++++ b/src/runtime/runtime_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private Runtime validation and dispatch helpers. */
+ #pragma once
++#ifndef AGENT_RUNTIME_INTERNAL_H
++#define AGENT_RUNTIME_INTERNAL_H
+ 
+ #include <agent/error.h>
+ #include <agent/runtime.h>
+@@ -22,3 +24,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_RUNTIME_INTERNAL_H */
+diff --git a/src/session/session_internal.h b/src/session/session_internal.h
+--- a/src/session/session_internal.h
++++ b/src/session/session_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private bounded conversation transactions and model projection. */
+ #pragma once
++#ifndef AGENT_SESSION_INTERNAL_H
++#define AGENT_SESSION_INTERNAL_H
+ 
+ #include "core/arena_internal.h"
+ #include <agent/config.h>
+@@ -44,3 +46,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_SESSION_INTERNAL_H */
+diff --git a/src/skill/skill_internal.h b/src/skill/skill_internal.h
+--- a/src/skill/skill_internal.h
++++ b/src/skill/skill_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private ordered skill registry and bounded projection. */
+ #pragma once
++#ifndef AGENT_SKILL_INTERNAL_H
++#define AGENT_SKILL_INTERNAL_H
+ 
+ #include "core/arena_internal.h"
+ #include <agent/skill.h>
+@@ -28,3 +30,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_SKILL_INTERNAL_H */
+diff --git a/src/tool/tool_guard.c b/src/tool/tool_guard.c
+--- a/src/tool/tool_guard.c
++++ b/src/tool/tool_guard.c
+@@ -54,10 +54,6 @@
+ static bool writable_buffer(const agent_t* agent, const agent_tool_context_t* context,
+                             const void* data, size_t bytes)
+ {
+-    const agent_string_view_t fields[] = {context->call.id, context->call.name,
+-                                          context->call.arguments_json, context->session_id,
+-                                          context->trace_id};
+-    size_t i;
+     size_t persistent = (size_t)(agent->scratch.base - (unsigned char*)agent->workspace);
+     if (!data || bytes > UINTPTR_MAX - (uintptr_t)data ||
+         agent_tool_overlaps(data, bytes, agent->workspace, persistent) ||
+@@ -65,13 +61,14 @@
+         agent_tool_overlaps(data, bytes, context, sizeof(*context)) ||
+         agent_tool_overlaps(data, bytes, context->limits, sizeof(*context->limits)) ||
+         (context->cancel &&
+-         agent_tool_overlaps(data, bytes, context->cancel, sizeof(*context->cancel))))
++         agent_tool_overlaps(data, bytes, context->cancel, sizeof(*context->cancel))) ||
++        agent_tool_overlaps(data, bytes, context->call.id.data, context->call.id.size) ||
++        agent_tool_overlaps(data, bytes, context->call.name.data, context->call.name.size) ||
++        agent_tool_overlaps(data, bytes, context->call.arguments_json.data,
++                            context->call.arguments_json.size) ||
++        agent_tool_overlaps(data, bytes, context->session_id.data, context->session_id.size) ||
++        agent_tool_overlaps(data, bytes, context->trace_id.data, context->trace_id.size))
+         return false;
+-    for (i = 0u; i < sizeof(fields) / sizeof(fields[0]); ++i)
+-    {
+-        if (agent_tool_overlaps(data, bytes, fields[i].data, fields[i].size))
+-            return false;
+-    }
+     return true;
+ }
+ 
+diff --git a/src/tool/tool_internal.h b/src/tool/tool_internal.h
+--- a/src/tool/tool_internal.h
++++ b/src/tool/tool_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private tool registry, schema validation, and guarded dispatch. */
+ #pragma once
++#ifndef AGENT_TOOL_INTERNAL_H
++#define AGENT_TOOL_INTERNAL_H
+ 
+ #include "core/arena_internal.h"
+ #include <agent/config.h>
+@@ -59,3 +61,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_TOOL_INTERNAL_H */
+diff --git a/src/tool/tool_registry.c b/src/tool/tool_registry.c
+--- a/src/tool/tool_registry.c
++++ b/src/tool/tool_registry.c
+@@ -49,14 +49,13 @@
+     for (i = 0u; i < registry->count; ++i)
+     {
+         const agent_tool_t* t = &registry->entries[i];
+-        const agent_string_view_t fields[] = {t->name, t->description, t->input_schema_json,
+-                                              t->group, t->category};
+-        size_t j;
+-        for (j = 0u; j < sizeof(fields) / sizeof(fields[0]); ++j)
+-        {
+-            if (agent_tool_overlaps(data, size, fields[j].data, fields[j].size))
+-                return false;
+-        }
++        if (agent_tool_overlaps(data, size, t->name.data, t->name.size) ||
++            agent_tool_overlaps(data, size, t->description.data, t->description.size) ||
++            agent_tool_overlaps(data, size, t->input_schema_json.data,
++                                t->input_schema_json.size) ||
++            agent_tool_overlaps(data, size, t->group.data, t->group.size) ||
++            agent_tool_overlaps(data, size, t->category.data, t->category.size))
++            return false;
+     }
+     return true;
+ }
+diff --git a/src/transport/transport_internal.h b/src/transport/transport_internal.h
+--- a/src/transport/transport_internal.h
++++ b/src/transport/transport_internal.h
+@@ -4,6 +4,8 @@
+  */
+ /* Private bounded HTTP validation and dispatch. */
+ #pragma once
++#ifndef AGENT_TRANSPORT_INTERNAL_H
++#define AGENT_TRANSPORT_INTERNAL_H
+ 
+ #include <agent/transport.h>
+ 
+@@ -21,3 +23,5 @@
+ #ifdef __cplusplus
+ }
+ #endif
++
++#endif /* AGENT_TRANSPORT_INTERNAL_H */

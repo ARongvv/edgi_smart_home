@@ -1,0 +1,19 @@
+menu "SmartHome platform port"
+
+config SCA_HTTP_USE_TLS
+    bool "Enable HTTPS support in sca_http"
+    default y
+    select RT_USING_MBEDTLS
+    help
+        The cAGENT transport talks to cloud models over HTTPS.
+        Disabling this limits the port to plain HTTP and is only useful
+        for local gateway testing.
+
+config SCA_STORAGE_AUTO_FORMAT
+    bool "Format data partition when mount fails"
+    default y
+    help
+        Development convenience. Disable for production images so a
+        corrupted partition never silently erases user data.
+
+endmenu

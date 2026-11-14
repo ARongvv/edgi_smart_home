@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant App as 应用与界面
+    participant Core as cAGENT 核心
+    participant Model as 模型提供者
+    participant Guard as 工具守卫与策略
+    participant Tool as 工具及公共控制服务
+    participant Store as 会话存储
+    App->>Core: agent_run(请求)
+    Core->>Store: 打开本轮并读取有限历史
+    Core->>Core: 构建系统指令、上下文与用户偏好
+    loop ReAct 循环（受步数与截止时间限制）
+        Core->>Model: 消息、工具清单与历史
+        Model-->>Core: 文本或工具调用
+        alt 返回工具调用
+            Core->>Store: 追加模型工具调用
+            Core->>Guard: 参数校验与授权判断
+            Guard->>Tool: 执行一次并获取有界结果
+            Tool-->>Core: 确认、失败或结果未确认
+            Core-->>App: 工具执行事件
+            Core->>Store: 追加工具结果
+        else 返回最终文本
+            Core-->>App: 交付最终文本
+            Core->>Store: 追加最终文本
+        end
+    end
+    Core->>Store: 提交完整轮次
+    Core-->>App: 执行、会话与交付状态以及统计
